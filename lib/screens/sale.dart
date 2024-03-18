@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class Sale extends StatefulWidget {
-  const Sale({Key? key, required this.image_path});
+  const Sale({Key? key, required this.image_path, required this.user_name});
 
   final List<String>? image_path;
-
+  final String user_name;
   @override
   State<Sale> createState() => _SaleState();
 }
@@ -17,7 +17,7 @@ class Sale extends StatefulWidget {
 class _SaleState extends State<Sale> {
   void initState() {
     super.initState();
-    getSales();
+    getSales(widget.user_name);
   }
 
   final IP = '10.160.96.72';
@@ -34,9 +34,9 @@ class _SaleState extends State<Sale> {
 
   ImagePicker imagePicker = new ImagePicker();
 
-  void getSales() async {
+  void getSales(String userName) async {
     try {
-      String url = "http://${IP}/appsale/getSales.php";
+      String url = "http://${IP}/appsale/getSales.php?user_name=$userName";
       var response = await http.get(Uri.parse(url), headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json',
@@ -123,7 +123,7 @@ class _SaleState extends State<Sale> {
       String saleNum, String saleStatus, String saleDate) async {
     showDialog(
       context: context,
-      builder: (_) {
+      builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Sale Details'),
           content: Column(
@@ -180,7 +180,7 @@ class _SaleState extends State<Sale> {
     return sale_no.isEmpty
         ? Center(
             child: Text(
-              'ไม่มีรายการสั่งซื้อ',
+              'ไม่มีรายการที่ชำระเงิน',
               style: TextStyle(fontSize: 18, color: Colors.white),
             ),
           )

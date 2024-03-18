@@ -1,7 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'dart:convert' as convert;
+import 'dart:convert';
 import 'shop.dart';
+import 'services/auth_service.dart';
 
 void main() {
   runApp(MainPage());
@@ -15,7 +16,8 @@ class MainPage extends StatelessWidget {
     return MaterialApp(
       home: Login(),
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(brightness: Brightness.dark),
+      theme:
+          ThemeData(brightness: Brightness.dark, primarySwatch: Colors.orange),
     );
   }
 }
@@ -38,34 +40,39 @@ class _LoginState extends State<Login> {
   void checkLogin(String username, String password) async {
     try {
       String url = "http://${IP}/appsale/login.php?us=$username&pw=$password";
+      var response = await http.get(Uri.parse(url));
 
-      print(url);
-      var response = await http.get(Uri.parse(url), headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'Accept': 'application/json',
-        'Charset': 'utf-8'
-      });
       if (response.statusCode == 200) {
-        var rs = response.body.replaceAll('ï»¿', '');
-        var rsLogin = convert.jsonDecode(rs);
+        var jsonResponse = json.decode(response.body);
 
-        setState(() {
-          login = rsLogin['login'];
-          if (login.contains('OK')) {
+        if (jsonResponse['login'] == 'OK') {
+          var userData = jsonResponse['user_data'];
+          var userName = userData['user_name'];
+          var firstName = userData['firstname'];
+          var lastName = userData['lastname'];
+          var userStatus = userData['user_status'];
+
+          setState(() {
+            login = 'OK';
             resultLogin = 'Login ถูกต้อง';
 
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => MenuPage(
-                        user_name: usname.text,
-                      )),
+                builder: (context) => MenuPage(
+                  user_name: userName,
+                  user_status: userStatus,
+                  // Pass other user data to MenuPage as needed
+                ),
+              ),
             );
-          } else {
+          });
+        } else {
+          setState(() {
+            login = 'NO';
             resultLogin = 'Login ผิดพลาด';
-          }
-        });
-        // print(_lsProducts?[0].title);
+          });
+        }
       } else {
         print('Request failed with status: ${response.statusCode}.');
         throw Exception('Failed to load Data');
@@ -73,7 +80,7 @@ class _LoginState extends State<Login> {
     } catch (e) {
       print(e);
     }
-  } //searchBusinessByGroup
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +146,7 @@ class _LoginState extends State<Login> {
                   onPressed: () {
                     setState(() {
                       checkLogin(usname.text, pws.text);
+                      authService.updateAuthState(true);
                       //           Navigator.push(
                       //   context,
                       //   MaterialPageRoute(builder: (context) => const MenuPage()),

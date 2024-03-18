@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/product.dart';
 import 'screens/sale.dart';
 import 'screens/slip.dart';
+import 'services/auth_service.dart';
 
 class ShopPage extends StatelessWidget {
   const ShopPage({Key? key});
@@ -11,15 +12,20 @@ class ShopPage extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(brightness: Brightness.dark),
-      home: MenuPage(user_name: 'sanhanat1'),
+      home: MenuPage(
+        user_name: 'Test',
+        user_status: null,
+      ),
     );
   }
 }
 
 class MenuPage extends StatefulWidget {
   final String user_name;
+  final String? user_status;
 
-  const MenuPage({Key? key, required this.user_name}) : super(key: key);
+  const MenuPage({Key? key, required this.user_name, required this.user_status})
+      : super(key: key);
 
   @override
   State<MenuPage> createState() => _MenuPageState();
@@ -34,8 +40,13 @@ class _MenuPageState extends State<MenuPage> {
     super.initState();
     menu = [
       Product(user_name: widget.user_name),
-      Sale(image_path: null),
-      Slip(),
+      Sale(
+        image_path: null,
+        user_name: widget.user_name,
+      ),
+      Slip(
+        user_name: widget.user_name,
+      ),
     ];
   }
 
@@ -76,6 +87,9 @@ class _MenuPageState extends State<MenuPage> {
                     PopupMenuItem(
                       child: Text('ชื่อผู้ใช้งาน ${widget.user_name}'),
                     ),
+                    PopupMenuItem(
+                      child: Text('${widget.user_status}'),
+                    ),
                   ],
                 );
               },
@@ -85,6 +99,8 @@ class _MenuPageState extends State<MenuPage> {
       ),
       body: menu[index],
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
         currentIndex: index,
         onTap: (value) {
           setState(() {

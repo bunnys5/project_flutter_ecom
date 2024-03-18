@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
+import 'screens/product.dart';
+
 class OrderPage extends StatefulWidget {
   const OrderPage(
       {super.key,
@@ -129,6 +131,7 @@ class _OrderPageState extends State<OrderPage> {
                   setState(() {
                     insertOrder(
                         widget.user_name, widget.product_id, sale_num.text);
+                    Navigator.of(context).pop();
                   });
                 },
                 child: Text(

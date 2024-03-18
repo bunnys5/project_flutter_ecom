@@ -6,10 +6,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 class Slip extends StatefulWidget {
-  const Slip({
-    Key? key,
-  });
+  const Slip({Key? key, required this.user_name});
 
+  final String user_name;
   @override
   State<Slip> createState() => _SlipState();
 }
@@ -17,7 +16,7 @@ class Slip extends StatefulWidget {
 class _SlipState extends State<Slip> {
   void initState() {
     super.initState();
-    getSlip();
+    getSlip(widget.user_name);
   }
 
   final IP = '10.160.96.72';
@@ -31,9 +30,9 @@ class _SlipState extends State<Slip> {
 
   ImagePicker imagePicker = new ImagePicker();
 
-  void getSlip() async {
+  void getSlip(String userName) async {
     try {
-      String url = "http://${IP}/appsale/getSlip.php";
+      String url = "http://${IP}/appsale/getSlip.php?user_name=$userName";
       var response = await http.get(Uri.parse(url), headers: {
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json',
@@ -74,7 +73,7 @@ class _SlipState extends State<Slip> {
       String imageSlip) async {
     showDialog(
       context: context,
-      builder: (_) {
+      builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Sale Details'),
           content: Column(
